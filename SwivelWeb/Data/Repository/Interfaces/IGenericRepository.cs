@@ -16,6 +16,6 @@ namespace SwivelWeb.Data.Repository.Interfaces
         Task<int> Delete(Expression<Func<T, bool>> filter);
         void Delete(T entityToDelete);
         void Update(T entityToUpdate);
-        Task Save();
+        Task<int> Save();
     }
 }

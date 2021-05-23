@@ -19,43 +19,81 @@ namespace SwivelWeb.Data.Repository.Services
             this.dbSet = context.Set<T>();
 
         }
-        public Task<IEnumerable<T>> Get(Expression<Func<T, bool>> filter = null, string includeProperties = "")
+        public async Task<IEnumerable<T>> Get(Expression<Func<T, bool>> filter = null, string includeProperties = "")
         {
-            throw new NotImplementedException();
+            IQueryable<T> query = dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            var propList = includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var includeProperty in propList)
+            {
+                query = query.Include(includeProperty);
+            }
+
+
+            return await query.ToListAsync();
         }
 
-        public Task<T> GetByID(object id)
+        public async Task<T> GetByID(object id)
         {
-            throw new NotImplementedException();
+            return await dbSet.FindAsync(id);
         }
 
-        public Task<T> GetSingle(Expression<Func<T, bool>> filter = null, string includeProperties = "")
+        public async Task<T> GetSingle(Expression<Func<T, bool>> filter = null, string includeProperties = "")
         {
-            throw new NotImplementedException();
+            IQueryable<T> query = dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            var propList = includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var includeProperty in propList)
+            {
+                query = query.Include(includeProperty);
+            }
+
+            return await query.FirstOrDefaultAsync();
         }
 
         public void Insert(T entity)
         {
-            throw new NotImplementedException();
+            dbSet.Add(entity);
         }
 
         public void Update(T entityToUpdate)
         {
-            throw new NotImplementedException();
+            dbSet.Attach(entityToUpdate);
+
+            context.Entry(entityToUpdate).State = EntityState.Modified;
         }
-        public Task<int> Delete(Expression<Func<T, bool>> filter)
+        public async Task<int> Delete(Expression<Func<T, bool>> filter)
         {
-            throw new NotImplementedException();
+            T entityToDelete = await dbSet.FirstOrDefaultAsync(filter);
+            Delete(entityToDelete);
+            return 1;
         }
 
         public void Delete(T entityToDelete)
         {
-            throw new NotImplementedException();
+            if (entityToDelete != null)
+            {
+                if (context.Entry(entityToDelete).State == EntityState.Detached)
+                {
+                    dbSet.Attach(entityToDelete);
+                }
+                dbSet.Remove(entityToDelete);
+            }
         }
 
-        public Task Save()
+        public async Task<int> Save()
         {
-            throw new NotImplementedException();
+            return await context.SaveChangesAsync();
         }
 
     }
