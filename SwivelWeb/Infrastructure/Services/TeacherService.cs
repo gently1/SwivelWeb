@@ -29,6 +29,9 @@ namespace SwivelWeb.Infrastructure.Services
 
         public async Task<bool> AddCourse(int courseId, int teacherId)
         {
+            var totalCourses = await courseRepo.GetQueryable(x => x.TeacherId == teacherId).CountAsync();
+            if (totalCourses == 3)
+                return false;
             var data = new TeacherCourse { CourseId = courseId, TeacherId = teacherId };
             courseRepo.Insert(data);
             var result = await courseRepo.Save();
