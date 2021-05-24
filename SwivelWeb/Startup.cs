@@ -11,10 +11,8 @@ using Microsoft.OpenApi.Models;
 using SwivelWeb.Data;
 using SwivelWeb.Data.Repository.Interfaces;
 using SwivelWeb.Data.Repository.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using SwivelWeb.Infrastructure.Interfaces;
+using SwivelWeb.Infrastructure.Services;
 
 namespace SwivelWeb
 {
@@ -38,6 +36,9 @@ namespace SwivelWeb
             });
 
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped<ITeacherService, TeacherService>();
+            services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<ICourseService, CourseService>();
 
             services.AddSwaggerGen(c =>
             {

@@ -14,7 +14,9 @@ namespace SwivelWeb.Models
         public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
+        [EmailAddress, Required]
         public string Email { get; set; }
+        [Phone]
         public string Phone { get; set; }
         public ICollection<TeacherCourse> Courses { get; set; }
     }

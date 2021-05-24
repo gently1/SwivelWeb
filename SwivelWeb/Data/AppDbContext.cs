@@ -13,6 +13,16 @@ namespace SwivelWeb.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            builder.Entity<Student>().HasIndex(t => t.Email).IsUnique();
+            builder.Entity<Teacher>().HasIndex(t => t.Email).IsUnique();
+            builder.Entity<Course>().HasIndex(t => t.Code).IsUnique();
+
+        }
+
         public DbSet<Course> Courses { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Teacher> Teachers { get; set; }

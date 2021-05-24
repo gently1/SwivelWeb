@@ -14,5 +14,7 @@ namespace SwivelWeb.Models
         public string Name { get; set; }
         [Required]
         public string Code { get; set; }
+        public ICollection<Student> Students { get; set; }
+        public ICollection<Teacher> Teachers { get; set; }
     }
 }
