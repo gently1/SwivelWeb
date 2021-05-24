@@ -1,4 +1,6 @@
-﻿using SwivelWeb.Infrastructure.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using SwivelWeb.Data.Repository.Interfaces;
+using SwivelWeb.Infrastructure.Interfaces;
 using SwivelWeb.Models;
 using System;
 using System.Collections.Generic;
@@ -10,44 +12,56 @@ namespace SwivelWeb.Infrastructure.Services
 {
     public class CourseService : ICourseService
     {
-        public Task<bool> Add(Course vm)
+        private readonly IGenericRepository<Course> repository;
+
+        public CourseService(IGenericRepository<Course> repository)
         {
-            throw new NotImplementedException();
+            this.repository = repository;
+        }
+        public async Task<bool> Add(Course vm)
+        {
+            repository.Insert(vm);
+            var result = await repository.Save();
+            return result > 0;
         }
 
-        public Task<bool> Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            throw new NotImplementedException();
+            await repository.Delete(x => x.Id == id);
+            var result = await repository.Save();
+            return result > 0;
         }
 
-        public Task<Course> Get(string code)
+        public async Task<Course> Get(string code)
         {
-            throw new NotImplementedException();
+            return await repository.GetSingle(x => x.Code.Equals(code));
         }
 
-        public Task<IEnumerable<Course>> GetAll()
+        public async Task<IEnumerable<Course>> GetAll()
         {
-            throw new NotImplementedException();
+            return await repository.GetQueryable().ToListAsync();
         }
 
-        public Task<Course> GetWithAll(string code)
+        public async Task<Course> GetWithAll(string code)
         {
-            throw new NotImplementedException();
+            return await repository.GetSingle(x => x.Code.Equals(code), includeProperties: "Students,Teachers");
         }
 
-        public Task<Course> GetWithStudents(string code)
+        public async Task<Course> GetWithStudents(string code)
         {
-            throw new NotImplementedException();
+            return await repository.GetSingle(x => x.Code.Equals(code), includeProperties: "Students");
         }
 
-        public Task<Course> GetWithTeachers(string code)
+        public async Task<Course> GetWithTeachers(string code)
         {
-            throw new NotImplementedException();
+            return await repository.GetSingle(x => x.Code.Equals(code), includeProperties: "Teachers");
         }
 
-        public Task<bool> Update(Course data)
+        public async Task<bool> Update(Course data)
         {
-            throw new NotImplementedException();
+            repository.Update(data);
+            var result = await repository.Save();
+            return result > 0;
         }
     }
 }

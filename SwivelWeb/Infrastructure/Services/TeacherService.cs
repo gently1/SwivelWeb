@@ -1,4 +1,6 @@
-﻿using SwivelWeb.Infrastructure.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using SwivelWeb.Data.Repository.Interfaces;
+using SwivelWeb.Infrastructure.Interfaces;
 using SwivelWeb.Models;
 using System;
 using System.Collections.Generic;
@@ -10,49 +12,68 @@ namespace SwivelWeb.Infrastructure.Services
 {
     public class TeacherService : ITeacherService
     {
-        public Task<bool> Add(Teacher vm)
+        private readonly IGenericRepository<Teacher> repository;
+        private readonly IGenericRepository<TeacherCourse> courseRepo;
+
+        public TeacherService(IGenericRepository<Teacher> repository, IGenericRepository<TeacherCourse> courseRepo)
         {
-            throw new NotImplementedException();
+            this.repository = repository;
+            this.courseRepo = courseRepo;
+        }
+        public async Task<bool> Add(Teacher vm)
+        {
+            repository.Insert(vm);
+            var result = await repository.Save();
+            return result > 0;
         }
 
-        public Task<bool> AddCourse(int courseId, int teacherId)
+        public async Task<bool> AddCourse(int courseId, int teacherId)
         {
-            throw new NotImplementedException();
+            var data = new TeacherCourse { CourseId = courseId, TeacherId = teacherId };
+            courseRepo.Insert(data);
+            var result = await courseRepo.Save();
+            return result > 0;
         }
 
-        public Task<bool> Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            throw new NotImplementedException();
+            await repository.Delete(x => x.Id == id);
+            var result = await repository.Save();
+            return result > 0;
         }
 
-        public Task<bool> DeleteCourse(int courseId, int teacherId)
+        public async Task<bool> DeleteCourse(int courseId, int teacherId)
         {
-            throw new NotImplementedException();
+            await courseRepo.Delete(x => x.CourseId == courseId && x.TeacherId == teacherId);
+            var result = await courseRepo.Save();
+            return result > 0;
         }
 
-        public Task<Teacher> Get(string email)
+        public async Task<Teacher> Get(string email)
         {
-            throw new NotImplementedException();
+            return await repository.GetSingle(x => x.Email.Equals(email));
         }
 
-        public Task<IEnumerable<Teacher>> GetAll()
+        public async Task<IEnumerable<Teacher>> GetAll()
         {
-            throw new NotImplementedException();
+            return await repository.GetQueryable().ToListAsync();
         }
 
-        public Task<IEnumerable<Course>> GetCourses(string email)
+        public async Task<IEnumerable<Course>> GetCourses(string email)
         {
-            throw new NotImplementedException();
+            return (await repository.GetSingle(x => x.Email.Equals(email), "Courses"))?.Courses?.Select(x => x.Course);
         }
 
-        public Task<Teacher> GetWithCourses(string email)
+        public async Task<Teacher> GetWithCourses(string email)
         {
-            throw new NotImplementedException();
+            return await repository.GetSingle(x => x.Email.Equals(email), includeProperties: "Courses");
         }
 
-        public Task<bool> Update(Teacher data)
+        public async Task<bool> Update(Teacher data)
         {
-            throw new NotImplementedException();
+            repository.Update(data);
+            var result = await repository.Save();
+            return result > 0;
         }
     }
 }
