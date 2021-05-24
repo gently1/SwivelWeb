@@ -19,6 +19,27 @@ namespace SwivelWeb.Data.Repository.Services
             this.dbSet = context.Set<T>();
 
         }
+
+
+        public IQueryable<T> GetQueryable(Expression<Func<T, bool>> filter = null, string includeProperties = "")
+        {
+            IQueryable<T> query = dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            foreach (var includeProperty in includeProperties.Split
+                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+
+            return query;
+        }
+
         public async Task<IEnumerable<T>> Get(Expression<Func<T, bool>> filter = null, string includeProperties = "")
         {
             IQueryable<T> query = dbSet;
@@ -38,7 +59,7 @@ namespace SwivelWeb.Data.Repository.Services
             return await query.ToListAsync();
         }
 
-        public async Task<T> GetByID(object id)
+        public async Task<T> GetByID(int id)
         {
             return await dbSet.FindAsync(id);
         }

@@ -9,9 +9,10 @@ namespace SwivelWeb.Data.Repository.Interfaces
 {
     public interface IGenericRepository<T>
     {
+        IQueryable<T> GetQueryable(Expression<Func<T, bool>> filter = null, string includeProperties = "");
         Task<IEnumerable<T>> Get(Expression<Func<T, bool>> filter = null, string includeProperties = "");
         Task<T> GetSingle(Expression<Func<T, bool>> filter = null,  string includeProperties = "");
-        Task<T> GetByID(object id);
+        Task<T> GetByID(int id);
         void Insert(T entity);
         Task<int> Delete(Expression<Func<T, bool>> filter);
         void Delete(T entityToDelete);
